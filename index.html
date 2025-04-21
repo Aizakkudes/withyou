@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Our Moment</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    body {
+      background: linear-gradient(135deg, #1e1e2f, #3e2f4f);
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #cardWrapper {
+      width: 100%;
+      max-width: 390px;
+      overflow: hidden;
+      transition: max-height 0.6s ease;
+      max-height: 80vh;
+      border-radius: 1.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      z-index: 2;
+      position: relative;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(20px);
+      height: 100%;
+      width: 100%;
+      padding: 1.5rem;
+      box-sizing: border-box;
+      overflow-y: auto;
+      border-radius: 1.5rem;
+      position: relative;
+      z-index: 2;
+    }
+    #cardWrapper::before {
+      content: '';
+      position: absolute;
+      width: 120%;
+      height: 120%;
+      left: -10%;
+      top: -10%;
+      background: radial-gradient(circle, rgba(255,192,203,0.15), transparent);
+      border-radius: 2rem;
+      animation: softPulse 4s ease-in-out infinite;
+      z-index: 1;
+    }
+    @keyframes softPulse {
+      0%, 100% { opacity: 0.4; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.05); }
+    }
+    .progress-bar {
+      transition: width 0.2s ease-in-out;
+    }
+    .sparkle {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: white;
+      border-radius: 50%;
+      opacity: 0.9;
+      animation: sparkle-float 1.2s ease-out forwards;
+      pointer-events: none;
+      z-index: 10;
+    }
+    @keyframes sparkle-float {
+      0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(-60px) scale(0.7) rotate(180deg); opacity: 0; }
+    }
+    @keyframes bounce-glow {
+      0% { transform: scale(1); box-shadow: 0 0 0px rgba(255,255,255,0.2); }
+      30% { transform: scale(1.03); box-shadow: 0 0 20px rgba(255,255,255,0.6); }
+      60% { transform: scale(0.98); box-shadow: 0 0 12px rgba(255,255,255,0.4); }
+      100% { transform: scale(1); box-shadow: 0 0 0px rgba(255,255,255,0.2); }
+    }
+    .bounce-glow { animation: bounce-glow 1.2s ease-in-out 1; }
+
+    #hiddenMessage {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      margin-top: 1.5rem;
+      margin-bottom: 1rem;
+      padding: 1rem;
+      padding-bottom: 2.5rem;
+      background-color: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 1rem;
+      box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.1);
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+      overflow-y: auto;
+      max-height: 25vh;
+      position: relative;
+      box-sizing: border-box;
+    }
+
+    #mysteryBtn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.5rem;
+      width: 24px;
+      position: relative;
+      animation: pulse-heart 1.5s ease-in-out infinite;
+    }
+
+    #mysteryBtn i {
+      transition: color 0.3s ease, transform 0.3s ease, text-shadow 0.3s ease;
+    }
+
+    #mysteryBtn i.bi-heart {
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(255, 255, 255, 0.7);
+      text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+    }
+
+    #mysteryBtn.filled i.bi-heart-fill {
+      color: #ff6b6b;
+      text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+      transform: scale(1.1);
+    }
+
+    #mysteryBtn:hover i.bi-heart {
+      -webkit-text-stroke: 1px rgba(255, 255, 255, 0.9);
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+    }
+
+    #mysteryBtn.filled:hover i.bi-heart-fill {
+      color: #ff8787;
+      transform: scale(1.2);
+    }
+
+    @keyframes pulse-heart {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    #prevBtn, #nextBtn, #shuffleBtn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      transition: color 0.3s ease;
+      color: #ffffff;
+    }
+    #prevBtn:hover, #nextBtn:hover, #shuffleBtn:hover {
+      color: #d1d5db;
+    }
+    #shuffleBtn {
+      margin-left: 2.5rem;
+    }
+    #shuffleBtn.active {
+      color: #10b981;
+    }
+
+    #spotifyCode {
+      max-width: 18rem;
+      width: 100%;
+      height: auto;
+      border-radius: 0.5rem;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      display: block;
+    }
+
+    .confetti-heart {
+      position: fixed;
+      width: 12px;
+      height: 12px;
+      background: pink;
+      transform: rotate(45deg);
+      opacity: 0.8;
+      animation: floatConfetti 6s linear infinite;
+      z-index: 0;
+    }
+    .confetti-heart::before,
+    .confetti-heart::after {
+      content: '';
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: pink;
+      border-radius: 50%;
+    }
+    .confetti-heart::before { top: -6px; left: 0; }
+    .confetti-heart::after { top: 0; left: -6px; }
+
+    @keyframes floatConfetti {
+      0% { transform: translateY(0) rotate(45deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(45deg); opacity: 0; }
+    }
+
+    .fallen-heart {
+      position: fixed;
+      bottom: 10px;
+      width: 14px;
+      height: 14px;
+      background: pink;
+      transform: rotate(45deg) scale(1);
+      opacity: 0;
+      animation: appearAndSettle 0.6s ease-out forwards;
+      pointer-events: none;
+      z-index: 5;
+    }
+    .fallen-heart::before,
+    .fallen-heart::after {
+      content: '';
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      background: pink;
+      border-radius: 50%;
+    }
+    .fallen-heart::before { top: -7px; left: 0; }
+    .fallen-heart::after { top: 0; left: -7px; }
+
+    @keyframes appearAndSettle {
+      0% { transform: translateY(10px) scale(0.8) rotate(45deg); opacity: 0; }
+      100% { transform: translateY(0) scale(1) rotate(45deg); opacity: 0.8; }
+    }
+
+    .floating-particle {
+      position: fixed;
+      width: 4px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.4);
+      border-radius: 50%;
+      animation: floatUp 15s linear infinite;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(0) scale(1); opacity: 0.4; }
+      100% { transform: translateY(-100vh) scale(0.8); opacity: 0; }
+    }
+
+    .heart-burst {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      background: #ff6b6b;
+      transform: rotate(45deg);
+      opacity: 0.9;
+      animation: heart-burst 1s ease-out forwards;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .heart-burst::before,
+    .heart-burst::after {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      background: #ff6b6b;
+      border-radius: 50%;
+    }
+    .heart-burst::before { top: -8px; left: 0; }
+    .heart-burst::after { top: 0; left: -8px; }
+    @keyframes heart-burst {
+      0% { transform: translate(0, 0) rotate(45deg) scale(1); opacity: 0.9; }
+      100% { transform: translate(var(--x), var(--y)) rotate(45deg) scale(0.5); opacity: 0; }
+    }
+
+    body.scroll-enabled, html.scroll-enabled {
+      height: auto !important;
+      overflow-y: auto !important;
+    }
+    body.scroll-enabled #cardWrapper {
+      max-height: none !important;
+    }
+
+    #songDetails {
+      position: relative;
+      overflow: hidden;
+    }
+    .song-details-container {
+      position: relative;
+      transition: all 0.4s ease-in-out;
+    }
+    .slide-out-left {
+      animation: slide-out-left 0.4s ease-in-out forwards;
+    }
+    .slide-out-right {
+      animation: slide-out-right 0.4s ease-in-out forwards;
+    }
+    .slide-in-left {
+      animation: slide-in-left 0.4s ease-in-out forwards;
+    }
+    .slide-in-right {
+      animation: slide-in-right 0.4s ease-in-out forwards;
+    }
+    @keyframes slide-out-left {
+      0% { transform: translateX(0) scale(1); opacity: 1; }
+      100% { transform: translateX(-100%) scale(0.95); opacity: 0; }
+    }
+    @keyframes slide-out-right {
+      0% { transform: translateX(0) scale(1); opacity: 1; }
+      100% { transform: translateX(100%) scale(0.95); opacity: 0; }
+    }
+    @keyframes slide-in-left {
+      0% { transform: translateX(100%) scale(0.95); opacity: 0; }
+      100% { transform: translateX(0) scale(1); opacity: 1; }
+    }
+    @keyframes slide-in-right {
+      0% { transform: translateX(-100%) scale(0.95); opacity: 0; }
+      100% { transform: translateX(0) scale(1); opacity: 1; }
+    }
+    .flex.justify-center.items-center.space-x-2.mb-3 {
+      flex-shrink: 0;
+      overflow: visible;
+    }
+  </style>
+</head>
+<body class="text-white">
+<div id="cardWrapper">
+    <div class="card z-10">
+      <div id="songDetails">
+        <div class="song-details-container">
+          <img id="songImage" src="us/photo1.jpg" alt="Us Together" class="w-full rounded-xl shadow-lg mb-4">
+          <div id="songTitle" class="text-xl font-semibold">Tibok</div>
+          <div id="artist" class="text-sm text-gray-300 mb-3">Earl Agustin</div>
+        </div>
+      </div>
+
+      <audio id="bg-music" src="music/Like.mp3"></audio>
+      <audio id="reveal-sound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_545f40c619.mp3"></audio>
+      <audio id="sparkle-sound" src="https://cdn.pixabay.com/audio/2023/03/21/audio_2d8b3d536b.mp3"></audio>
+
+      <div class="w-full h-2 bg-gray-700 rounded-full overflow-hidden mb-1">
+        <div id="progress" class="bg-green-400 h-full w-0 progress-bar"></div>
+      </div>
+
+      <div class="flex justify-between text-xs text-gray-400 mb-2">
+        <span id="currentTime">0:00</span>
+        <span id="duration">0:00</span>
+      </div>
+
+      <div class="flex justify-center items-center space-x-2 mb-3">
+        <div class="mr-10">
+          <button id="mysteryBtn" onclick="revealSurprise()">
+            <i class="bi bi-heart text-2xl"></i>
+          </button>
+        </div>
+        <button id="prevBtn" onclick="playPrevious()" class="hover:text-gray-300 transition-colors">
+          <i class="bi bi-skip-backward-fill text-2xl"></i>
+        </button>
+        <button id="playBtn" onclick="togglePlay()" class="bg-white text-black rounded-full w-12 h-12 flex items-center justify-center hover:bg-gray-200 transition-colors">
+          <i id="playIcon" class="bi bi-play-fill text-2xl"></i>
+          <i id="pauseIcon" class="bi bi-pause-fill text-2xl hidden"></i>
+        </button>
+        <button id="nextBtn" onclick="playNext()" class="hover:text-gray-300 transition-colors">
+          <i class="bi bi-skip-forward-fill text-2xl"></i>
+        </button>
+        <button id="shuffleBtn" onclick="toggleShuffle()" class="hover:text-gray-300 transition-colors">
+          <i class="bi bi-shuffle text-2xl"></i>
+        </button>
+      </div>
+
+      <div class="flex justify-center mt-1">
+        <img id="spotifyCode" src="us/tibok.jpg" alt="Spotify Code" class="h-auto rounded-md">
+      </div>
+
+      <div id="hiddenMessage">
+        <span id="line1" class="block"></span>
+        <span id="line2" class="block mt-1"></span>
+        <span id="line3" class="block mt-1"></span>
+        <span id="line4" class="block mt-1"></span>
+        <span id="line5" class="block mt-1"></span>
+        <span id="line6" class="block mt-1"></span>
+        <span id="line7" class="block mt-1"></span>
+        <span id="line8" class="block mt-1"></span>
+        <span id="line9" class="block mt-1"></span>
+        <span id="line10" class="block mt-1"></span>
+        <span id="line11" class="block mt-1"></span>
+        <span id="line12" class="block mt-1"></span>
+        <span id="line13" class="block mt-1"></span>
+        <span id="line14" class="block mt-1"></span>
+        <span id="line15" class="block mt-1"></span>
+        <span id="line16" class="block mt-1"></span>
+
+        <div id="extraContent" style="display: none;">
+          <div class="mt-4 text-right text-sm text-white italic" style="font-family: 'Brush Script MT', cursive;">
+            — Yours always, your honeybunch💙
+          </div>
+
+          <div class="mt-6 flex justify-center">
+            <div class="bg-white p-2 rounded-lg shadow-lg text-center w-40">
+              <img src="us/first.jpg" class="w-full h-40 object-cover rounded-sm border border-gray-300" alt="Mini Polaroid">
+              <div class="mt-1 text-xs text-gray-700 italic">Our first monthsary✨</div>
+            </div>
+          </div>
+
+          <div class="mt-6 text-center text-sm text-pink-200 italic">
+            “A month of love, a month of laughter, a month of you and me — and this is just the beginning. Happy first monthsary, Mi Sol.”
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const audio = document.getElementById("bg-music");
+    const playBtn = document.getElementById("playBtn");
+    const playIcon = document.getElementById("playIcon");
+    const pauseIcon = document.getElementById("pauseIcon");
+    const progress = document.getElementById("progress");
+    const currentTimeEl = document.getElementById("currentTime");
+    const durationEl = document.getElementById("duration");
+    const songTitleEl = document.getElementById("songTitle");
+    const artistEl = document.getElementById("artist");
+    const songImageEl = document.getElementById("songImage");
+    const spotifyCodeEl = document.getElementById("spotifyCode");
+    const songDetails = document.getElementById("songDetails");
+    const revealSound = document.getElementById("reveal-sound");
+    const sparkleSound = document.getElementById("sparkle-sound");
+    const cardWrapper = document.getElementById("cardWrapper");
+
+    const playlist = [
+      {
+        title: "Tibok",
+        artist: "Earl Agustin",
+        src: "music/tibok.mp3",
+        image: "us/photo1.jpg",
+        spotifyCode: "us/tibok.png"
+      },
+      {
+        title: "Bawat Sandali",
+        artist: "Amiel Sol",
+        src: "music/sandali.mp3",
+        image: "us/photo2.jpg",
+        spotifyCode: "us/sandali.png"
+      },
+      {
+        title: "I Like You So Much, You'll Know It",
+        artist: "Ysabelle Cuevas",
+        src: "music/like.mp3",
+        image: "us/photo3.jpg",
+        spotifyCode: "us/like.png"
+      },
+      {
+        title: "You'll Be In My Heart",
+        artist: "NIKI",
+        src: "music/myheart.mp3",
+        image: "us/photo5.jpg",
+        spotifyCode: "us/heart.png"
+      },
+      {
+        title: "Spring Snow",
+        artist: "10cm",
+        src: "music/Spring.mp3",
+        image: "us/night.jpg",
+        spotifyCode: "us/spring.png"
+      },
+      {
+        title: "I Like Me Better",
+        artist: "Lauv",
+        src: "music/better.mp3",
+        image: "us/photo4.jpg",
+        spotifyCode: "us/better.png"
+      }
+    ];
+
+    let currentSongIndex = 0;
+    let isPlaying = false;
+    let isShuffling = false;
+    let isMessageVisible = false;
+
+    function loadSong(index) {
+      const song = playlist[index];
+      audio.src = song.src;
+      songTitleEl.textContent = song.title;
+      artistEl.textContent = song.artist;
+      songImageEl.src = song.image;
+      spotifyCodeEl.src = song.spotifyCode;
+      progress.style.width = "0%";
+      currentTimeEl.textContent = "0:00";
+      durationEl.textContent = "0:00";
+      audio.load();
+      if (isPlaying) {
+        audio.play().catch((error) => {
+          console.error("Playback failed:", error);
+          isPlaying = false;
+          playIcon.classList.remove("hidden");
+          pauseIcon.classList.add("hidden");
+        });
+        playIcon.classList.add("hidden");
+        pauseIcon.classList.remove("hidden");
+      } else {
+        playIcon.classList.remove("hidden");
+        pauseIcon.classList.add("hidden");
+      }
+    }
+
+    function togglePlay() {
+      if (audio.paused) {
+        audio.play().catch((error) => {
+          console.error("Playback failed:", error);
+        });
+        isPlaying = true;
+        playIcon.classList.add("hidden");
+        pauseIcon.classList.remove("hidden");
+      } else {
+        audio.pause();
+        isPlaying = false;
+        playIcon.classList.remove("hidden");
+        pauseIcon.classList.add("hidden");
+      }
+    }
+
+    function toggleShuffle() {
+      isShuffling = !isShuffling;
+      const shuffleBtn = document.getElementById("shuffleBtn");
+      if (isShuffling) {
+        shuffleBtn.classList.add("active");
+      } else {
+        shuffleBtn.classList.remove("active");
+      }
+    }
+
+    function getRandomSongIndex(currentIndex) {
+      let newIndex;
+      do {
+        newIndex = Math.floor(Math.random() * playlist.length);
+      } while (newIndex === currentIndex);
+      return newIndex;
+    }
+
+    function createSongDetailsClone(index, direction) {
+      const song = playlist[index];
+      const clone = document.createElement("div");
+      clone.className = "song-details-container";
+      clone.innerHTML = `
+        <img src="${song.image}" alt="${song.title}" class="w-full rounded-xl shadow-lg mb-4">
+        <div class="text-xl font-semibold">${song.title}</div>
+        <div class="text-sm text-gray-300 mb-3">${song.artist}</div>
+      `;
+      clone.style.position = "absolute";
+      clone.style.top = "0";
+      clone.style.left = "0";
+      clone.style.width = "100%";
+      songDetails.appendChild(clone);
+      return clone;
+    }
+
+    function playPrevious() {
+      const currentDetails = songDetails.querySelector(".song-details-container");
+      const newIndex = (currentSongIndex - 1 + playlist.length) % playlist.length;
+      const newDetails = createSongDetailsClone(newIndex, "previous");
+
+      currentDetails.classList.add("slide-out-right");
+      newDetails.classList.add("slide-in-right");
+
+      setTimeout(() => {
+        currentSongIndex = newIndex;
+        loadSong(currentSongIndex);
+        currentDetails.remove();
+        newDetails.classList.remove("slide-in-right");
+        newDetails.style.position = "relative";
+      }, 400);
+    }
+
+    function playNext() {
+      const currentDetails = songDetails.querySelector(".song-details-container");
+      const newIndex = isShuffling ? getRandomSongIndex(currentSongIndex) : (currentSongIndex + 1) % playlist.length;
+      const newDetails = createSongDetailsClone(newIndex, "next");
+
+      currentDetails.classList.add("slide-out-left");
+      newDetails.classList.add("slide-in-left");
+
+      setTimeout(() => {
+        currentSongIndex = newIndex;
+        loadSong(currentSongIndex);
+        currentDetails.remove();
+        newDetails.classList.remove("slide-in-left");
+        newDetails.style.position = "relative";
+      }, 400);
+    }
+
+    function formatTime(time) {
+      const minutes = Math.floor(time / 60);
+      const seconds = Math.floor(time % 60).toString().padStart(2, '0');
+      return `${minutes}:${seconds}`;
+    }
+
+    audio.addEventListener("loadedmetadata", () => {
+      durationEl.textContent = formatTime(audio.duration);
+    });
+
+    audio.addEventListener("timeupdate", () => {
+      const percent = (audio.currentTime / audio.duration) * 100;
+      progress.style.width = percent + "%";
+      currentTimeEl.textContent = formatTime(audio.currentTime);
+    });
+
+    audio.addEventListener("ended", () => {
+      const newIndex = isShuffling ? getRandomSongIndex(currentSongIndex) : (currentSongIndex + 1) % playlist.length;
+      currentSongIndex = newIndex;
+      loadSong(currentSongIndex);
+    });
+
+    function revealSurprise() {
+      const mysteryBtn = document.getElementById("mysteryBtn");
+      const heartIcon = mysteryBtn.querySelector("i");
+      const msg = document.getElementById("hiddenMessage");
+
+      if (isMessageVisible) {
+        msg.style.opacity = "0";
+        heartIcon.classList.remove("bi-heart-fill");
+        heartIcon.classList.add("bi-heart");
+        mysteryBtn.classList.remove("filled");
+        setTimeout(() => {
+          msg.style.visibility = "hidden";
+          document.body.classList.remove("scroll-enabled");
+          document.documentElement.classList.remove("scroll-enabled");
+          const ids = ["line1", "line2", "line3", "line4", "line5", "line6", "line7", "line8", "line9", "line10", "line11", "line12", "line13", "line14", "line15", "line16"];
+          ids.forEach(id => document.getElementById(id).innerHTML = "");
+          document.getElementById("extraContent").style.display = "none";
+          msg.classList.remove("bounce-glow");
+        }, 500);
+        isMessageVisible = false;
+      } else {
+        msg.style.visibility = "visible";
+        msg.style.opacity = "1";
+        heartIcon.classList.remove("bi-heart");
+        heartIcon.classList.add("bi-heart-fill");
+        mysteryBtn.classList.add("filled");
+        document.body.classList.add("scroll-enabled");
+        document.documentElement.classList.add("scroll-enabled");
+
+        function createHeartBurst() {
+          for (let i = 0; i < 20; i++) {
+            const heart = document.createElement("div");
+            heart.className = "heart-burst";
+            const x = (Math.random() - 0.5) * 200;
+            const y = (Math.random() - 0.5) * 200;
+            heart.style.setProperty("--x", `${x}px`);
+            heart.style.setProperty("--y", `${y}px`);
+            heart.style.left = `50%`;
+            heart.style.top = `50%`;
+            cardWrapper.appendChild(heart);
+            setTimeout(() => heart.remove(), 1000);
+          }
+        }
+
+        function createSurpriseSparkles() {
+          for (let i = 0; i < 15; i++) {
+            setTimeout(() => createSparkle(cardWrapper), i * 50);
+          }
+        }
+
+        revealSound.play();
+        createHeartBurst();
+        createSurpriseSparkles();
+
+        setTimeout(() => {
+          msg.scrollIntoView({ behavior: "smooth", block: "end" });
+          const lines = [
+            'You clicked the heart... just like you stole mine.💘',
+            '',
+            'Happy 1st Monthsary, <span class="text-pink-300 font-bold">Babe</span>!',
+            '',
+            'Ang bilis lang—parang kahapon lang nung nag-match tayo sa Tinder, tapos ngayon, ikaw na ‘yung nagpapasaya sa’kin araw-araw.',
+            'Di ko pa rin makalimutan yung araw na sinagot mo ako sa Sawangan Park.',
+            'Ang hangin, yung dagat, OPM love songs pa sa background, tapos ikaw pa ‘yung katabi ko… grabe sarap sa feeling, <span class="text-pink-300 font-bold">Hon</span>.',
+            'Kaya kahit ilang beses ko sinabing “labelan na” in a playful way, deep inside seryoso ako nun.',
+            'And when you finally agreed—best feeling ever. gagiii',
+            'Hindi rin mawawala sa isip ko yung duet natin kahit alam kong pangit boses ko. Pero dahil ikaw ‘yung kasama ko, na-enjoy ko pa rin.',
+            '<span class="text-pink-300 font-bold">Love</span>, ang ganda ng boses mo—wag kang mahiya.',
+            'I’ll never get tired of hearing it… and of choosing you.',
+            '<span class="text-pink-300 font-bold">Mahal</span>, thank you for being my pahinga, my happiness, my favorite person.',
+            'Here’s to more months, more songs, more memories.',
+            'Pipiliin pa rin kita, araw-araw.',
+            'Love you always, <span class="text-pink-300 font-bold">Baby</span>.🤍'
+          ];
+          const ids = ["line1", "line2", "line3", "line4", "line5", "line6", "line7", "line8", "line9", "line10", "line11", "line12", "line13", "line14", "line15", "line16"];
+          const speeds = [40, 10, 40, 10, 60, 50, 60, 60, 40, 60, 50, 50, 50, 40, 40, 40];
+
+          function typeLine(lineIndex = 0, charIndex = 0) {
+            if (lineIndex >= lines.length) return;
+            const target = document.getElementById(ids[lineIndex]);
+            const text = lines[lineIndex];
+            const speed = speeds[lineIndex];
+
+            if (charIndex < text.length) {
+              const tempDiv = document.createElement("div");
+              tempDiv.innerHTML = text.substring(0, charIndex + 1);
+              target.innerHTML = tempDiv.innerHTML +
+                '<span class="border-r border-gray-300 animate-pulse ml-0.5"> </span>';
+              msg.scrollTop = msg.scrollHeight;
+              window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+              setTimeout(() => typeLine(lineIndex, charIndex + 1), speed);
+            } else {
+              target.innerHTML = text;
+              if (lineIndex === lines.length - 1) {
+                msg.classList.add("bounce-glow");
+                sparkleSound.play();
+                for (let i = 0; i < 30; i++) {
+                  setTimeout(() => createSparkle(msg), i * 25);
+                }
+                setTimeout(() => {
+                  document.getElementById("extraContent").style.display = "block";
+                }, 600);
+              }
+              setTimeout(() => typeLine(lineIndex + 1, 0), 800);
+            }
+          }
+
+          typeLine();
+        }, 1000);
+        isMessageVisible = true;
+      }
+    }
+
+    function createSparkle(container) {
+      const sparkle = document.createElement("div");
+      sparkle.className = "sparkle";
+      sparkle.style.left = Math.random() * 90 + "%";
+      sparkle.style.top = Math.random() * 30 + 60 + "%";
+      sparkle.style.background = ["#fff", "#ffd700", "#add8e6", "#f9c6f9"][Math.floor(Math.random() * 4)];
+      sparkle.style.width = sparkle.style.height = (6 + Math.random() * 6) + "px";
+      sparkle.style.animationDuration = (1.2 + Math.random()).toFixed(2) + "s";
+      container.appendChild(sparkle);
+      setTimeout(() => sparkle.remove(), 2000);
+    }
+
+    let petalCount = 0;
+    const maxPetals = 12;
+
+    function createConfettiHearts() {
+      for (let i = 0; i < 15; i++) {
+        const heart = document.createElement('div');
+        heart.className = 'confetti-heart';
+        heart.style.left = Math.random() * 100 + 'vw';
+        heart.style.top = '-' + (Math.random() * 20) + 'vh';
+        heart.style.zIndex = Math.random() < 0.3 ? '11' : '0';
+        heart.style.animationDelay = Math.random() * 6 + 's';
+        document.body.appendChild(heart);
+        setTimeout(() => {
+          heart.remove();
+          if (petalCount < maxPetals) {
+            const fallen = document.createElement('div');
+            fallen.className = 'fallen-heart';
+            fallen.style.left = (5 + Math.random() * 90) + 'vw';
+            fallen.style.bottom = (5 + Math.random() * 10) + 'px';
+            document.body.appendChild(fallen);
+            petalCount++;
+          }
+        }, 8000);
+      }
+    }
+
+    function createFloatingParticles() {
+      for (let i = 0; i < 15; i++) {
+        const particle = document.createElement("div");
+        particle.className = "floating-particle";
+        particle.style.left = Math.random() * 90 + "vw";
+        particle.style.top = Math.random() * 100 + "vh";
+        document.body.appendChild(particle);
+        setTimeout(() => particle.remove(), 15000);
+      }
+    }
+
+    loadSong(currentSongIndex);
+    createConfettiHearts();
+    setInterval(createConfettiHearts, 6000);
+    setInterval(createFloatingParticles, 7000);
+  </script>
+</body>
+</html>
